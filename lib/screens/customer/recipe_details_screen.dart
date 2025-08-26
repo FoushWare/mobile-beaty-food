@@ -32,7 +32,7 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
   void _loadRecipe() {
     final recipeProvider = Provider.of<RecipeProvider>(context, listen: false);
     recipe = recipeProvider.getRecipeById(widget.recipeId);
-    
+
     if (recipe == null) {
       // Recipe not found, go back
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -92,7 +92,7 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
               ),
             ],
           ),
-          
+
           // Content
           SliverToBoxAdapter(
             child: Padding(
@@ -114,7 +114,8 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: colorScheme.secondary,
                           borderRadius: BorderRadius.circular(20),
@@ -140,9 +141,9 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: AppConstants.defaultSpacing),
-                  
+
                   // Description
                   Text(
                     recipe!.description,
@@ -151,22 +152,22 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                     ),
                     textDirection: TextDirection.rtl,
                   ),
-                  
+
                   const SizedBox(height: AppConstants.largeSpacing),
-                  
+
                   // Quick Info
                   _buildQuickInfo(context, theme, colorScheme),
-                  
+
                   const SizedBox(height: AppConstants.largeSpacing),
-                  
+
                   // Ingredients
                   _buildIngredientsSection(context, theme, colorScheme),
-                  
+
                   const SizedBox(height: AppConstants.largeSpacing),
-                  
+
                   // Instructions
                   _buildInstructionsSection(context, theme, colorScheme),
-                  
+
                   const SizedBox(height: 100), // Space for bottom button
                 ],
               ),
@@ -174,7 +175,7 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
           ),
         ],
       ),
-      
+
       // Bottom Add to Cart Button
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(AppConstants.defaultSpacing),
@@ -202,7 +203,7 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                   Row(
                     children: [
                       Text(
-                        '${recipe!.price.toStringAsFixed(0)}',
+                        recipe!.price.toStringAsFixed(0),
                         style: theme.textTheme.titleLarge?.copyWith(
                           color: colorScheme.primary,
                           fontWeight: FontWeight.bold,
@@ -219,9 +220,7 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                   ),
                 ],
               ),
-              
               const SizedBox(width: AppConstants.defaultSpacing),
-              
               Expanded(
                 child: Consumer<CartProvider>(
                   builder: (context, cartProvider, child) {
@@ -235,13 +234,17 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                             child: Container(
                               decoration: BoxDecoration(
                                 border: Border.all(color: colorScheme.primary),
-                                borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
+                                borderRadius: BorderRadius.circular(
+                                    AppConstants.defaultBorderRadius),
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
                                   IconButton(
-                                    onPressed: () => cartProvider.updateQuantity(recipe!.id, quantity - 1),
+                                    onPressed: () =>
+                                        cartProvider.updateQuantity(
+                                            recipe!.id, quantity - 1),
                                     icon: Icon(
                                       Icons.remove,
                                       color: colorScheme.primary,
@@ -249,13 +252,15 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                                   ),
                                   Text(
                                     quantity.toString(),
-                                    style: theme.textTheme.titleMedium?.copyWith(
+                                    style:
+                                        theme.textTheme.titleMedium?.copyWith(
                                       color: colorScheme.primary,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   IconButton(
-                                    onPressed: () => cartProvider.addItem(recipe!),
+                                    onPressed: () =>
+                                        cartProvider.addItem(recipe!),
                                     icon: Icon(
                                       Icons.add,
                                       color: colorScheme.primary,
@@ -268,7 +273,8 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                           const SizedBox(width: AppConstants.smallSpacing),
                           AppButton.primary(
                             text: 'السلة',
-                            onPressed: () => AppRouter.push('${AppRouter.customerHome}/cart'),
+                            onPressed: () => AppRouter.push(
+                                '${AppRouter.customerHome}/cart'),
                             icon: const Icon(Icons.shopping_cart),
                           ),
                         ],
@@ -291,7 +297,8 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
     );
   }
 
-  Widget _buildQuickInfo(BuildContext context, ThemeData theme, ColorScheme colorScheme) {
+  Widget _buildQuickInfo(
+      BuildContext context, ThemeData theme, ColorScheme colorScheme) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(AppConstants.defaultSpacing),
@@ -372,7 +379,8 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
     );
   }
 
-  Widget _buildIngredientsSection(BuildContext context, ThemeData theme, ColorScheme colorScheme) {
+  Widget _buildIngredientsSection(
+      BuildContext context, ThemeData theme, ColorScheme colorScheme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -384,7 +392,6 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
           textDirection: TextDirection.rtl,
         ),
         const SizedBox(height: AppConstants.defaultSpacing),
-        
         Card(
           child: Padding(
             padding: const EdgeInsets.all(AppConstants.defaultSpacing),
@@ -421,7 +428,8 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
     );
   }
 
-  Widget _buildInstructionsSection(BuildContext context, ThemeData theme, ColorScheme colorScheme) {
+  Widget _buildInstructionsSection(
+      BuildContext context, ThemeData theme, ColorScheme colorScheme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -433,7 +441,6 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
           textDirection: TextDirection.rtl,
         ),
         const SizedBox(height: AppConstants.defaultSpacing),
-        
         ...recipe!.instructions.map((step) {
           return Card(
             margin: const EdgeInsets.only(bottom: AppConstants.smallSpacing),
@@ -460,7 +467,6 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                     ),
                   ),
                   const SizedBox(width: AppConstants.defaultSpacing),
-                  
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -479,13 +485,15 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                               Icon(
                                 Icons.schedule,
                                 size: 16,
-                                color: colorScheme.onSurface.withValues(alpha: 0.6),
+                                color: colorScheme.onSurface
+                                    .withValues(alpha: 0.6),
                               ),
                               const SizedBox(width: 4),
                               Text(
                                 '${step.timeMinutes} دقيقة',
                                 style: theme.textTheme.labelSmall?.copyWith(
-                                  color: colorScheme.onSurface.withValues(alpha: 0.6),
+                                  color: colorScheme.onSurface
+                                      .withValues(alpha: 0.6),
                                 ),
                               ),
                             ],
@@ -498,7 +506,7 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
               ),
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }

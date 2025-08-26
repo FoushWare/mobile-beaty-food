@@ -2,6 +2,7 @@ class Address {
   final String id;
   final String street;
   final String city;
+  final String state;
   final String area;
   final String building;
   final String floor;
@@ -15,6 +16,7 @@ class Address {
     required this.id,
     required this.street,
     required this.city,
+    required this.state,
     required this.area,
     this.building = '',
     this.floor = '',
@@ -30,6 +32,7 @@ class Address {
       id: json['id'] ?? '',
       street: json['street'] ?? '',
       city: json['city'] ?? '',
+      state: json['state'] ?? '',
       area: json['area'] ?? '',
       building: json['building'] ?? '',
       floor: json['floor'] ?? '',
@@ -46,6 +49,7 @@ class Address {
       'id': id,
       'street': street,
       'city': city,
+      'state': state,
       'area': area,
       'building': building,
       'floor': floor,
@@ -65,6 +69,7 @@ class Address {
       street,
       area,
       city,
+      state,
     ].where((part) => part.isNotEmpty);
     return parts.join(', ');
   }
@@ -73,6 +78,7 @@ class Address {
     String? id,
     String? street,
     String? city,
+    String? state,
     String? area,
     String? building,
     String? floor,
@@ -86,6 +92,7 @@ class Address {
       id: id ?? this.id,
       street: street ?? this.street,
       city: city ?? this.city,
+      state: state ?? this.state,
       area: area ?? this.area,
       building: building ?? this.building,
       floor: floor ?? this.floor,

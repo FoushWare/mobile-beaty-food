@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/auth_provider.dart';
-import '../../models/auth.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
 
@@ -36,10 +34,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
     try {
       final success = await context.read<AuthProvider>().verifyOtp(
-        widget.phone,
-        _otpController.text,
-      );
-      
+            widget.phone,
+            _otpController.text,
+          );
+
       if (success && mounted) {
         // Navigate to profile completion screen
         Navigator.pushReplacementNamed(
@@ -60,7 +58,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
     try {
       await context.read<AuthProvider>().sendOtp(widget.phone);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -218,5 +216,3 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     );
   }
 }
-
-

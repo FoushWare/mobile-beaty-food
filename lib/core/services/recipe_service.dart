@@ -1,13 +1,12 @@
-import 'dart:convert';
 import 'package:dio/dio.dart';
 import '../../models/recipe.dart';
 
 class RecipeService {
   static const String _baseUrl = 'http://localhost:3000/api';
   static const String _recipesBaseUrl = '$_baseUrl/recipes';
-  
+
   late final Dio _dio;
-  
+
   RecipeService() {
     _dio = Dio(BaseOptions(
       baseUrl: _recipesBaseUrl,
@@ -24,7 +23,7 @@ class RecipeService {
   Future<List<Recipe>> getAllRecipes() async {
     try {
       final response = await _dio.get('/');
-      
+
       if (response.data['success'] == true) {
         final List<dynamic> recipesData = response.data['data'];
         return recipesData.map((json) => Recipe.fromJson(json)).toList();
@@ -42,7 +41,7 @@ class RecipeService {
   Future<Recipe?> getRecipeById(String id) async {
     try {
       final response = await _dio.get('/$id');
-      
+
       if (response.data['success'] == true && response.data['data'] != null) {
         return Recipe.fromJson(response.data['data']);
       } else {
@@ -62,12 +61,13 @@ class RecipeService {
   Future<List<Recipe>> getRecipesByChef(String chefId) async {
     try {
       final response = await _dio.get('/chef/$chefId');
-      
+
       if (response.data['success'] == true) {
         final List<dynamic> recipesData = response.data['data'];
         return recipesData.map((json) => Recipe.fromJson(json)).toList();
       } else {
-        throw Exception(response.data['message'] ?? 'Failed to fetch chef recipes');
+        throw Exception(
+            response.data['message'] ?? 'Failed to fetch chef recipes');
       }
     } on DioException catch (e) {
       throw Exception(_handleDioError(e));
@@ -80,12 +80,13 @@ class RecipeService {
   Future<List<Recipe>> getRecipesByCategory(String category) async {
     try {
       final response = await _dio.get('/category/$category');
-      
+
       if (response.data['success'] == true) {
         final List<dynamic> recipesData = response.data['data'];
         return recipesData.map((json) => Recipe.fromJson(json)).toList();
       } else {
-        throw Exception(response.data['message'] ?? 'Failed to fetch category recipes');
+        throw Exception(
+            response.data['message'] ?? 'Failed to fetch category recipes');
       }
     } on DioException catch (e) {
       throw Exception(_handleDioError(e));
@@ -98,12 +99,13 @@ class RecipeService {
   Future<List<Recipe>> getRecipesByCuisine(String cuisine) async {
     try {
       final response = await _dio.get('/cuisine/$cuisine');
-      
+
       if (response.data['success'] == true) {
         final List<dynamic> recipesData = response.data['data'];
         return recipesData.map((json) => Recipe.fromJson(json)).toList();
       } else {
-        throw Exception(response.data['message'] ?? 'Failed to fetch cuisine recipes');
+        throw Exception(
+            response.data['message'] ?? 'Failed to fetch cuisine recipes');
       }
     } on DioException catch (e) {
       throw Exception(_handleDioError(e));
@@ -116,7 +118,7 @@ class RecipeService {
   Future<List<Recipe>> searchRecipes(String query) async {
     try {
       final response = await _dio.get('/search', queryParameters: {'q': query});
-      
+
       if (response.data['success'] == true) {
         final List<dynamic> recipesData = response.data['data'];
         return recipesData.map((json) => Recipe.fromJson(json)).toList();
@@ -145,20 +147,23 @@ class RecipeService {
   }) async {
     try {
       final Map<String, dynamic> queryParams = {};
-      
+
       if (category != null) queryParams['category'] = category;
       if (cuisine != null) queryParams['cuisine'] = cuisine;
-      if (isVegetarian != null) queryParams['isVegetarian'] = isVegetarian.toString();
+      if (isVegetarian != null)
+        queryParams['isVegetarian'] = isVegetarian.toString();
       if (isVegan != null) queryParams['isVegan'] = isVegan.toString();
-      if (isGlutenFree != null) queryParams['isGlutenFree'] = isGlutenFree.toString();
+      if (isGlutenFree != null)
+        queryParams['isGlutenFree'] = isGlutenFree.toString();
       if (isHalal != null) queryParams['isHalal'] = isHalal.toString();
       if (difficulty != null) queryParams['difficulty'] = difficulty;
       if (minPrice != null) queryParams['minPrice'] = minPrice.toString();
       if (maxPrice != null) queryParams['maxPrice'] = maxPrice.toString();
-      if (maxPrepTime != null) queryParams['maxPrepTime'] = maxPrepTime.toString();
+      if (maxPrepTime != null)
+        queryParams['maxPrepTime'] = maxPrepTime.toString();
 
       final response = await _dio.get('/filter', queryParameters: queryParams);
-      
+
       if (response.data['success'] == true) {
         final List<dynamic> recipesData = response.data['data'];
         return recipesData.map((json) => Recipe.fromJson(json)).toList();
@@ -176,12 +181,13 @@ class RecipeService {
   Future<List<String>> getCategories() async {
     try {
       final response = await _dio.get('/categories');
-      
+
       if (response.data['success'] == true) {
         final List<dynamic> categoriesData = response.data['data'];
         return categoriesData.map((category) => category.toString()).toList();
       } else {
-        throw Exception(response.data['message'] ?? 'Failed to fetch categories');
+        throw Exception(
+            response.data['message'] ?? 'Failed to fetch categories');
       }
     } on DioException catch (e) {
       throw Exception(_handleDioError(e));
@@ -195,12 +201,13 @@ class RecipeService {
     try {
       try {
         final response = await _dio.get('/cuisines');
-        
+
         if (response.data['success'] == true) {
           final List<dynamic> cuisinesData = response.data['data'];
           return cuisinesData.map((cuisine) => cuisine.toString()).toList();
         } else {
-          throw Exception(response.data['message'] ?? 'Failed to fetch cuisines');
+          throw Exception(
+              response.data['message'] ?? 'Failed to fetch cuisines');
         }
       } on DioException catch (e) {
         throw Exception(_handleDioError(e));
@@ -234,7 +241,3 @@ class RecipeService {
     return message;
   }
 }
-
-
-
-

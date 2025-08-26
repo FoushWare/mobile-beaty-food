@@ -1,15 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:baty_bites/models/recipe.dart';
-import 'package:baty_bites/core/services/sample_data_service.dart';
+import 'package:baty_bites/core/services/recipe_service.dart';
 
 class RecipeProvider extends ChangeNotifier {
   List<Recipe> _recipes = [];
   List<Recipe> _featuredRecipes = [];
-  List<String> _favoriteIds = [];
+  final List<String> _favoriteIds = [];
   bool _isLoading = false;
   String _searchQuery = '';
   String _selectedCategory = 'الكل';
   String _selectedCuisineType = '';
+
+  final RecipeService _recipeService = RecipeService();
 
   List<Recipe> get recipes => _recipes;
   List<Recipe> get featuredRecipes => _featuredRecipes;
@@ -23,12 +25,14 @@ class RecipeProvider extends ChangeNotifier {
     var filtered = _recipes.where((recipe) {
       bool matchesSearch = _searchQuery.isEmpty ||
           recipe.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          recipe.description.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          recipe.description
+              .toLowerCase()
+              .contains(_searchQuery.toLowerCase()) ||
           recipe.cuisineType.toLowerCase().contains(_searchQuery.toLowerCase());
-      
-      bool matchesCategory = _selectedCategory == 'الكل' ||
-          recipe.category == _selectedCategory;
-      
+
+      bool matchesCategory =
+          _selectedCategory == 'الكل' || recipe.category == _selectedCategory;
+
       bool matchesCuisine = _selectedCuisineType.isEmpty ||
           recipe.cuisineType == _selectedCuisineType;
 
@@ -50,14 +54,14 @@ class RecipeProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
-      
-      _recipes = SampleDataService.getSampleRecipes();
+      final recipes = await _recipeService.getAllRecipes();
+      _recipes = recipes;
       _featuredRecipes = _recipes.where((recipe) => recipe.isFeatured).toList();
-      
     } catch (e) {
       debugPrint('Error loading recipes: $e');
+      // Fallback to sample data if API fails
+      _recipes = [];
+      _featuredRecipes = [];
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -105,12 +109,14 @@ class RecipeProvider extends ChangeNotifier {
       _favoriteIds.add(recipeId);
     }
     notifyListeners();
-    
+
     // TODO: Save to storage and sync with API
   }
 
   List<Recipe> get favoriteRecipes {
-    return _recipes.where((recipe) => _favoriteIds.contains(recipe.id)).toList();
+    return _recipes
+        .where((recipe) => _favoriteIds.contains(recipe.id))
+        .toList();
   }
 
   List<Recipe> getRecipesByChef(String chefId) {
@@ -122,7 +128,9 @@ class RecipeProvider extends ChangeNotifier {
   }
 
   List<Recipe> getRecipesByCuisine(String cuisineType) {
-    return _recipes.where((recipe) => recipe.cuisineType == cuisineType).toList();
+    return _recipes
+        .where((recipe) => recipe.cuisineType == cuisineType)
+        .toList();
   }
 
   Future<void> refreshRecipes() async {

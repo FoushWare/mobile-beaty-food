@@ -193,6 +193,30 @@ class AuthData {
       verified: json['verified'],
     );
   }
+
+  AuthData copyWith({
+    String? accessToken,
+    String? refreshToken,
+    String? userId,
+    String? phone,
+    ProfileCompletionLevel? profileLevel,
+    UserType? userType,
+    String? name,
+    String? email,
+    bool? verified,
+  }) {
+    return AuthData(
+      accessToken: accessToken ?? this.accessToken,
+      refreshToken: refreshToken ?? this.refreshToken,
+      userId: userId ?? this.userId,
+      phone: phone ?? this.phone,
+      profileLevel: profileLevel ?? this.profileLevel,
+      userType: userType ?? this.userType,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      verified: verified ?? this.verified,
+    );
+  }
 }
 
 class ProfileCompletionResponse {

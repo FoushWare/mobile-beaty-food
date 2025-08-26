@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/recipe_provider.dart';
 import '../../models/auth.dart';
-import '../../models/recipe.dart';
-import '../../core/services/recipe_service.dart';
 import '../../widgets/custom_button.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -111,9 +110,16 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildAuthenticatedView(BuildContext context, AuthProvider authProvider) {
-    final recipeService = RecipeService();
-    
-    return SingleChildScrollView(
+    return Consumer<RecipeProvider>(
+      builder: (context, recipeProvider, child) {
+        // Load recipes when the widget is first built
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (recipeProvider.recipes.isEmpty && !recipeProvider.isLoading) {
+            recipeProvider.loadRecipes();
+          }
+        });
+        
+        return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -226,9 +232,9 @@ class HomeScreen extends StatelessWidget {
           ),
           const SizedBox(height: 32),
 
-          // Sample Data Section
+          // Recipes Section
           const Text(
-            'بيانات تجريبية',
+            'الوصفات المتاحة',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -236,128 +242,95 @@ class HomeScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           
-          // Sample Recipes
-          const Text(
-            'وصفات تجريبية',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          FutureBuilder<List<Recipe>>(
-            future: recipeService.getAllRecipes(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const SizedBox(
-                  height: 200,
-                  child: Center(child: CircularProgressIndicator()),
-                );
-              }
-              
-              if (snapshot.hasError) {
-                return SizedBox(
-                  height: 200,
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.error_outline, color: Colors.red, size: 40),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Failed to load recipes',
-                          style: TextStyle(color: Colors.red),
+          // Recipes List
+          if (recipeProvider.isLoading)
+            const SizedBox(
+              height: 200,
+              child: Center(child: CircularProgressIndicator()),
+            )
+          else if (recipeProvider.recipes.isEmpty)
+            const SizedBox(
+              height: 200,
+              child: Center(
+                child: Text('لا توجد وصفات متاحة'),
+              ),
+            )
+          else
+            SizedBox(
+              height: 200,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: recipeProvider.recipes.length,
+                itemBuilder: (context, index) {
+                  final recipe = recipeProvider.recipes[index];
+                  return Container(
+                    width: 160,
+                    margin: const EdgeInsets.only(right: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
                         ),
                       ],
                     ),
-                  ),
-                );
-              }
-              
-              final recipes = snapshot.data ?? [];
-              
-              if (recipes.isEmpty) {
-                return const SizedBox(
-                  height: 200,
-                  child: Center(
-                    child: Text('No recipes available'),
-                  ),
-                );
-              }
-              
-              return SizedBox(
-                height: 200,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: recipes.length,
-                  itemBuilder: (context, index) {
-                    final recipe = recipes[index];
-                return Container(
-                  width: 160,
-                  margin: const EdgeInsets.only(right: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                        child: Image.network(
-                          recipe.image,
-                          height: 100,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              height: 100,
-                              color: Colors.grey[300],
-                              child: const Icon(Icons.restaurant, size: 40),
-                            );
-                          },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                          child: Image.network(
+                            recipe.images.isNotEmpty ? recipe.images.first : '',
+                            height: 100,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                height: 100,
+                                color: Colors.grey[300],
+                                child: const Icon(Icons.restaurant, size: 40),
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              recipe.title,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                recipe.title,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '${recipe.price.toStringAsFixed(0)} ج.م',
-                              style: TextStyle(
-                                color: Colors.green[600],
-                                fontWeight: FontWeight.w600,
+                              const SizedBox(height: 4),
+                              Text(
+                                '${recipe.price.toStringAsFixed(0)} ج.م',
+                                style: TextStyle(
+                                  color: Colors.green[600],
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              },
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      );
+      },
     );
   }
 

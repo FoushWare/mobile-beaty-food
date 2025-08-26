@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/auth_provider.dart';
-import '../../models/auth.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
 
@@ -9,7 +7,8 @@ class PhoneVerificationScreen extends StatefulWidget {
   const PhoneVerificationScreen({super.key});
 
   @override
-  State<PhoneVerificationScreen> createState() => _PhoneVerificationScreenState();
+  State<PhoneVerificationScreen> createState() =>
+      _PhoneVerificationScreenState();
 }
 
 class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
@@ -29,8 +28,9 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final success = await context.read<AuthProvider>().sendOtp(_phoneController.text);
-      
+      final success =
+          await context.read<AuthProvider>().sendOtp(_phoneController.text);
+
       if (success && mounted) {
         // Navigate to OTP verification screen
         Navigator.pushNamed(
@@ -165,5 +165,3 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
     );
   }
 }
-
-

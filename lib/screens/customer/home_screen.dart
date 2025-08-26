@@ -142,7 +142,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'مرحباً ${user?.fullName ?? 'بك'} 👋',
+                  'مرحباً ${user?['fullName'] ?? 'بك'} 👋',
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: colorScheme.onPrimary,
                     fontWeight: FontWeight.bold,
@@ -167,15 +167,14 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen>
                 color: colorScheme.onPrimary,
               ),
             ),
-            IconButton(
-              onPressed: () => AppRouter.push('${AppRouter.customerHome}/profile'),
+            PopupMenuButton<String>(
               icon: CircleAvatar(
                 radius: 16,
                 backgroundColor: colorScheme.onPrimary.withValues(alpha: 0.2),
-                backgroundImage: user?.profileImage.isNotEmpty == true 
-                    ? NetworkImage(user!.profileImage) 
+                backgroundImage: user?['profileImage']?.isNotEmpty == true 
+                    ? NetworkImage(user!['profileImage']) 
                     : null,
-                child: user?.profileImage.isEmpty != false
+                child: user?['profileImage']?.isEmpty != false
                     ? Icon(
                         Icons.person,
                         size: 18,
@@ -183,6 +182,65 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen>
                       )
                     : null,
               ),
+              onSelected: (value) {
+                if (value == 'profile') {
+                  AppRouter.push('${AppRouter.customerHome}/profile');
+                } else if (value == 'logout') {
+                  _showLogoutDialog(context, authProvider);
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem<String>(
+                  value: 'profile',
+                  child: Row(
+                    children: [
+                      Icon(Icons.person, color: colorScheme.primary),
+                      const SizedBox(width: 8),
+                      const Text('الملف الشخصي'),
+                    ],
+                  ),
+                ),
+                const PopupMenuDivider(),
+                PopupMenuItem<String>(
+                  value: 'logout',
+                  child: Row(
+                    children: [
+                      Icon(Icons.logout, color: colorScheme.error),
+                      const SizedBox(width: 8),
+                      Text(
+                        'تسجيل الخروج',
+                        style: TextStyle(color: colorScheme.error),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            PopupMenuButton<String>(
+              icon: Icon(
+                Icons.more_vert,
+                color: colorScheme.onPrimary,
+              ),
+              onSelected: (value) {
+                if (value == 'logout') {
+                  _showLogoutDialog(context, authProvider);
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem<String>(
+                  value: 'logout',
+                  child: Row(
+                    children: [
+                      Icon(Icons.logout, color: colorScheme.error),
+                      const SizedBox(width: 8),
+                      Text(
+                        'تسجيل الخروج',
+                        style: TextStyle(color: colorScheme.error),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ],
         );
@@ -479,6 +537,36 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen>
             break;
         }
       },
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context, AuthProvider authProvider) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'تسجيل الخروج',
+          textDirection: TextDirection.rtl,
+        ),
+        content: const Text(
+          'هل أنت متأكد من تسجيل الخروج؟',
+          textDirection: TextDirection.rtl,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('إلغاء'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await authProvider.logout();
+              AppRouter.go(AppRouter.welcome);
+            },
+            child: const Text('تسجيل الخروج'),
+          ),
+        ],
+      ),
     );
   }
 }

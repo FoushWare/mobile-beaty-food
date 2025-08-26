@@ -18,10 +18,12 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen>
   late AnimationController _animationController;
   late List<Animation<double>> _fadeAnimations;
   late List<Animation<Offset>> _slideAnimations;
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
     _setupAnimations();
   }
 
@@ -67,6 +69,7 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen>
   @override
   void dispose() {
     _animationController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -85,6 +88,19 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen>
     await storageService.saveSelectedUserType(userType);
   }
 
+  void _scrollToButton() {
+    // Wait a bit for the UI to update, then scroll to show the button
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -98,6 +114,7 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen>
           animation: _animationController,
           builder: (context, child) {
             return SingleChildScrollView(
+              controller: _scrollController,
               padding: const EdgeInsets.all(AppConstants.largeSpacing),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -172,6 +189,7 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen>
                           setState(() {
                             _selectedUserType = UserType.customer;
                           });
+                          _scrollToButton();
                         },
                         primaryColor: colorScheme.primary,
                       ),
@@ -200,6 +218,7 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen>
                           setState(() {
                             _selectedUserType = UserType.chef;
                           });
+                          _scrollToButton();
                         },
                         primaryColor: colorScheme.secondary,
                       ),

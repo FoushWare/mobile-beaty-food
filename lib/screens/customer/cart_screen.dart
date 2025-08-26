@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:baty_bites/core/router/app_router.dart';
 import 'package:baty_bites/core/constants/app_constants.dart';
-import 'package:baty_bites/providers/cart_provider.dart';
 import 'package:baty_bites/widgets/common/app_button.dart';
 
 class CartScreen extends StatelessWidget {
@@ -69,13 +68,16 @@ class CartScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final item = cartProvider.items[index];
                     return Card(
-                      margin: const EdgeInsets.only(bottom: AppConstants.defaultSpacing),
+                      margin: const EdgeInsets.only(
+                          bottom: AppConstants.defaultSpacing),
                       child: Padding(
-                        padding: const EdgeInsets.all(AppConstants.defaultSpacing),
+                        padding:
+                            const EdgeInsets.all(AppConstants.defaultSpacing),
                         child: Row(
                           children: [
                             ClipRRect(
-                              borderRadius: BorderRadius.circular(AppConstants.smallBorderRadius),
+                              borderRadius: BorderRadius.circular(
+                                  AppConstants.smallBorderRadius),
                               child: SizedBox(
                                 width: 60,
                                 height: 60,
@@ -83,12 +85,14 @@ class CartScreen extends StatelessWidget {
                                     ? Image.network(
                                         item.recipe.images.first,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) {
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
                                           return Container(
                                             color: colorScheme.primaryContainer,
                                             child: Icon(
                                               Icons.restaurant,
-                                              color: colorScheme.onPrimaryContainer,
+                                              color: colorScheme
+                                                  .onPrimaryContainer,
                                             ),
                                           );
                                         },
@@ -109,7 +113,8 @@ class CartScreen extends StatelessWidget {
                                 children: [
                                   Text(
                                     item.recipe.title,
-                                    style: theme.textTheme.titleMedium?.copyWith(
+                                    style:
+                                        theme.textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.bold,
                                     ),
                                     textDirection: TextDirection.rtl,
@@ -117,7 +122,8 @@ class CartScreen extends StatelessWidget {
                                   Text(
                                     'الشيف ${item.recipe.chefName}',
                                     style: theme.textTheme.bodySmall?.copyWith(
-                                      color: colorScheme.onSurface.withValues(alpha: 0.6),
+                                      color: colorScheme.onSurface
+                                          .withValues(alpha: 0.6),
                                     ),
                                     textDirection: TextDirection.rtl,
                                   ),
@@ -152,7 +158,8 @@ class CartScreen extends StatelessWidget {
                                   ),
                                 ),
                                 IconButton(
-                                  onPressed: () => cartProvider.addItem(item.recipe),
+                                  onPressed: () =>
+                                      cartProvider.addItem(item.recipe),
                                   icon: Icon(
                                     Icons.add_circle_outline,
                                     color: colorScheme.primary,
@@ -167,7 +174,7 @@ class CartScreen extends StatelessWidget {
                   },
                 ),
               ),
-              
+
               // Bottom Summary
               Container(
                 padding: const EdgeInsets.all(AppConstants.defaultSpacing),
@@ -207,11 +214,11 @@ class CartScreen extends StatelessWidget {
                             textDirection: TextDirection.rtl,
                           ),
                           Text(
-                            cartProvider.deliveryFee == 0 
+                            cartProvider.deliveryFee == 0
                                 ? 'مجاني'
                                 : '${cartProvider.deliveryFee.toStringAsFixed(0)} جنيه',
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: cartProvider.deliveryFee == 0 
+                              color: cartProvider.deliveryFee == 0
                                   ? colorScheme.secondary
                                   : null,
                             ),
@@ -241,7 +248,8 @@ class CartScreen extends StatelessWidget {
                       const SizedBox(height: AppConstants.defaultSpacing),
                       AppButton.primary(
                         text: 'المتابعة للدفع',
-                        onPressed: () => AppRouter.push('${AppRouter.customerHome}/checkout'),
+                        onPressed: () => AppRouter.push(
+                            '${AppRouter.customerHome}/checkout'),
                         isExpanded: true,
                         icon: const Icon(Icons.payment),
                       ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/auth_provider.dart';
 import '../../models/auth.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
@@ -14,10 +13,12 @@ class CompleteBasicProfileScreen extends StatefulWidget {
   });
 
   @override
-  State<CompleteBasicProfileScreen> createState() => _CompleteBasicProfileScreenState();
+  State<CompleteBasicProfileScreen> createState() =>
+      _CompleteBasicProfileScreenState();
 }
 
-class _CompleteBasicProfileScreenState extends State<CompleteBasicProfileScreen> {
+class _CompleteBasicProfileScreenState
+    extends State<CompleteBasicProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -38,12 +39,12 @@ class _CompleteBasicProfileScreenState extends State<CompleteBasicProfileScreen>
 
     try {
       final success = await context.read<AuthProvider>().completeBasicProfile(
-        phone: widget.phone,
-        name: _nameController.text,
-        email: _emailController.text,
-        userType: _selectedUserType,
-      );
-      
+            phone: widget.phone,
+            name: _nameController.text,
+            email: _emailController.text,
+            userType: _selectedUserType,
+          );
+
       if (success && mounted) {
         // Navigate to main app or profile completion
         if (_selectedUserType == UserType.chef) {
@@ -138,7 +139,8 @@ class _CompleteBasicProfileScreenState extends State<CompleteBasicProfileScreen>
                   if (value == null || value.isEmpty) {
                     return 'يرجى إدخال البريد الإلكتروني';
                   }
-                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                      .hasMatch(value)) {
                     return 'يرجى إدخال بريد إلكتروني صحيح';
                   }
                   return null;
@@ -182,7 +184,7 @@ class _CompleteBasicProfileScreenState extends State<CompleteBasicProfileScreen>
                     RadioListTile<UserType>(
                       title: const Row(
                         children: [
-                          Icon(Icons.chef_hat, color: Colors.green),
+                          Icon(Icons.restaurant, color: Colors.green),
                           SizedBox(width: 12),
                           Text('شيف'),
                         ],
@@ -251,5 +253,3 @@ class _CompleteBasicProfileScreenState extends State<CompleteBasicProfileScreen>
     );
   }
 }
-
-

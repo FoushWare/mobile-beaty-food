@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:baty_bites/core/router/app_router.dart';
 import 'package:baty_bites/core/constants/app_constants.dart';
-import 'package:baty_bites/models/user.dart';
+import 'package:baty_bites/models/auth.dart';
 import 'package:baty_bites/providers/auth_provider.dart';
 import 'package:baty_bites/widgets/common/app_button.dart';
 import 'package:baty_bites/widgets/common/app_text_field.dart';
@@ -24,15 +24,18 @@ class _RegisterScreenState extends State<RegisterScreen>
   late TextEditingController _fullNameController;
   late TextEditingController _emailController;
   late TextEditingController _phoneController;
-  late TextEditingController _passwordController;
-  late TextEditingController _confirmPasswordController;
+  late TextEditingController _otpController;
   late AnimationController _animationController;
   late List<Animation<double>> _fadeAnimations;
   late List<Animation<Offset>> _slideAnimations;
-  
+
   final _formKey = GlobalKey<FormState>();
   UserType _userType = UserType.customer;
   bool _acceptTerms = false;
+  final bool _isLoading = false;
+  final bool _otpSent = false;
+  final bool _isResendingOtp = false;
+  final int _resendCountdown = 0;
 
   @override
   void initState() {
@@ -46,8 +49,7 @@ class _RegisterScreenState extends State<RegisterScreen>
     _fullNameController = TextEditingController();
     _emailController = TextEditingController();
     _phoneController = TextEditingController();
-    _passwordController = TextEditingController();
-    _confirmPasswordController = TextEditingController();
+    _otpController = TextEditingController();
   }
 
   void _setupAnimations() {
@@ -94,15 +96,14 @@ class _RegisterScreenState extends State<RegisterScreen>
     _fullNameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
+    _otpController.dispose();
     _animationController.dispose();
     super.dispose();
   }
 
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     if (!_acceptTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -114,14 +115,8 @@ class _RegisterScreenState extends State<RegisterScreen>
     }
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
-    final success = await authProvider.register(
-      fullName: _fullNameController.text,
-      email: _emailController.text,
-      phone: _phoneController.text,
-      password: _passwordController.text,
-      userType: _userType,
-    );
+
+    final success = await authProvider.register(_phoneController.text);
 
     if (success && mounted) {
       // Navigate to appropriate home screen
@@ -238,7 +233,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
-                                _userType == UserType.customer 
+                                _userType == UserType.customer
                                     ? Icons.person_add
                                     : Icons.restaurant_menu,
                                 size: 40,
@@ -246,9 +241,8 @@ class _RegisterScreenState extends State<RegisterScreen>
                               ),
                             ),
                             const SizedBox(height: AppConstants.largeSpacing),
-                            
                             Text(
-                              _userType == UserType.customer 
+                              _userType == UserType.customer
                                   ? 'إنشاء حساب عميل'
                                   : 'إنشاء حساب طاهي',
                               style: theme.textTheme.headlineSmall?.copyWith(
@@ -259,13 +253,13 @@ class _RegisterScreenState extends State<RegisterScreen>
                               textDirection: TextDirection.rtl,
                             ),
                             const SizedBox(height: AppConstants.smallSpacing),
-                            
                             Text(
                               _userType == UserType.customer
                                   ? 'انضم إلينا واستمتع بأشهى الأطباق البيتية'
                                   : 'شاركنا وصفاتك المميزة واربح معنا',
                               style: theme.textTheme.bodyLarge?.copyWith(
-                                color: colorScheme.onSurface.withValues(alpha: 0.7),
+                                color: colorScheme.onSurface
+                                    .withValues(alpha: 0.7),
                               ),
                               textAlign: TextAlign.center,
                               textDirection: TextDirection.rtl,
@@ -274,9 +268,9 @@ class _RegisterScreenState extends State<RegisterScreen>
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: AppConstants.extraLargeSpacing),
-                    
+
                     // Full Name Field
                     FadeTransition(
                       opacity: _fadeAnimations[1],
@@ -293,9 +287,9 @@ class _RegisterScreenState extends State<RegisterScreen>
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: AppConstants.defaultSpacing),
-                    
+
                     // Email Field
                     FadeTransition(
                       opacity: _fadeAnimations[2],
@@ -312,9 +306,9 @@ class _RegisterScreenState extends State<RegisterScreen>
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: AppConstants.defaultSpacing),
-                    
+
                     // Phone Field
                     FadeTransition(
                       opacity: _fadeAnimations[2],
@@ -331,9 +325,9 @@ class _RegisterScreenState extends State<RegisterScreen>
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: AppConstants.defaultSpacing),
-                    
+
                     // Password Field
                     FadeTransition(
                       opacity: _fadeAnimations[3],
@@ -350,9 +344,9 @@ class _RegisterScreenState extends State<RegisterScreen>
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: AppConstants.defaultSpacing),
-                    
+
                     // Confirm Password Field
                     FadeTransition(
                       opacity: _fadeAnimations[3],
@@ -369,9 +363,9 @@ class _RegisterScreenState extends State<RegisterScreen>
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: AppConstants.defaultSpacing),
-                    
+
                     // Terms and Conditions
                     FadeTransition(
                       opacity: _fadeAnimations[4],
@@ -400,7 +394,8 @@ class _RegisterScreenState extends State<RegisterScreen>
                                   textDirection: TextDirection.rtl,
                                   text: TextSpan(
                                     style: theme.textTheme.bodySmall?.copyWith(
-                                      color: colorScheme.onSurface.withValues(alpha: 0.7),
+                                      color: colorScheme.onSurface
+                                          .withValues(alpha: 0.7),
                                     ),
                                     children: [
                                       const TextSpan(text: 'أوافق على '),
@@ -428,9 +423,9 @@ class _RegisterScreenState extends State<RegisterScreen>
                         ],
                       ),
                     ),
-                    
+
                     const SizedBox(height: AppConstants.largeSpacing),
-                    
+
                     // Register Button
                     FadeTransition(
                       opacity: _fadeAnimations[5],
@@ -449,9 +444,9 @@ class _RegisterScreenState extends State<RegisterScreen>
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: AppConstants.largeSpacing),
-                    
+
                     // Login Link
                     FadeTransition(
                       opacity: _fadeAnimations[5],
@@ -461,7 +456,8 @@ class _RegisterScreenState extends State<RegisterScreen>
                           Text(
                             'لديك حساب بالفعل؟ ',
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onSurface.withValues(alpha: 0.7),
+                              color:
+                                  colorScheme.onSurface.withValues(alpha: 0.7),
                             ),
                           ),
                           TextButton(

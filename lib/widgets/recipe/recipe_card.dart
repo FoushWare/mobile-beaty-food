@@ -32,14 +32,16 @@ class RecipeCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppConstants.largeBorderRadius),
       ),
       child: InkWell(
-        onTap: onTap ?? () => AppRouter.push('${AppRouter.customerHome}/recipe-details/${recipe.id}'),
+        onTap: onTap ??
+            () => AppRouter.push(
+                '${AppRouter.customerHome}/recipe-details/${recipe.id}'),
         borderRadius: BorderRadius.circular(AppConstants.largeBorderRadius),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image Section
             _buildImageSection(context, colorScheme),
-            
+
             // Content Section
             Padding(
               padding: const EdgeInsets.all(AppConstants.defaultSpacing),
@@ -48,24 +50,24 @@ class RecipeCard extends StatelessWidget {
                 children: [
                   // Title and Rating
                   _buildTitleAndRating(context, theme),
-                  
+
                   const SizedBox(height: AppConstants.smallSpacing),
-                  
+
                   // Chef Info
                   _buildChefInfo(context, theme, colorScheme),
-                  
+
                   const SizedBox(height: AppConstants.smallSpacing),
-                  
+
                   // Description
                   _buildDescription(context, theme, colorScheme),
-                  
+
                   const SizedBox(height: AppConstants.defaultSpacing),
-                  
+
                   // Tags and Details
                   _buildTagsAndDetails(context, theme, colorScheme),
-                  
+
                   const SizedBox(height: AppConstants.defaultSpacing),
-                  
+
                   // Price and Action
                   _buildPriceAndAction(context, theme, colorScheme),
                 ],
@@ -108,7 +110,7 @@ class RecipeCard extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // Favorite Button
         Positioned(
           top: AppConstants.smallSpacing,
@@ -135,7 +137,7 @@ class RecipeCard extends StatelessWidget {
             },
           ),
         ),
-        
+
         // Featured Badge
         if (recipe.isFeatured)
           Positioned(
@@ -148,7 +150,8 @@ class RecipeCard extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: colorScheme.tertiary,
-                borderRadius: BorderRadius.circular(AppConstants.smallBorderRadius),
+                borderRadius:
+                    BorderRadius.circular(AppConstants.smallBorderRadius),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -162,9 +165,9 @@ class RecipeCard extends StatelessWidget {
                   Text(
                     'مميز',
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: colorScheme.onTertiary,
-                      fontWeight: FontWeight.bold,
-                    ),
+                          color: colorScheme.onTertiary,
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                 ],
               ),
@@ -226,14 +229,15 @@ class RecipeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildChefInfo(BuildContext context, ThemeData theme, ColorScheme colorScheme) {
+  Widget _buildChefInfo(
+      BuildContext context, ThemeData theme, ColorScheme colorScheme) {
     return Row(
       children: [
         CircleAvatar(
           radius: 12,
           backgroundColor: colorScheme.primaryContainer,
-          backgroundImage: recipe.chefImage.isNotEmpty 
-              ? CachedNetworkImageProvider(recipe.chefImage) 
+          backgroundImage: recipe.chefImage.isNotEmpty
+              ? CachedNetworkImageProvider(recipe.chefImage)
               : null,
           child: recipe.chefImage.isEmpty
               ? Icon(
@@ -256,7 +260,8 @@ class RecipeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildDescription(BuildContext context, ThemeData theme, ColorScheme colorScheme) {
+  Widget _buildDescription(
+      BuildContext context, ThemeData theme, ColorScheme colorScheme) {
     return Text(
       recipe.description,
       style: theme.textTheme.bodyMedium?.copyWith(
@@ -269,7 +274,8 @@ class RecipeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildTagsAndDetails(BuildContext context, ThemeData theme, ColorScheme colorScheme) {
+  Widget _buildTagsAndDetails(
+      BuildContext context, ThemeData theme, ColorScheme colorScheme) {
     return Wrap(
       spacing: AppConstants.smallSpacing,
       runSpacing: AppConstants.smallSpacing / 2,
@@ -290,7 +296,8 @@ class RecipeCard extends StatelessWidget {
           context,
           icon: Icons.local_fire_department,
           text: recipe.spiceLevelText,
-          color: recipe.spiceLevel == SpiceLevel.hot || recipe.spiceLevel == SpiceLevel.extraHot
+          color: recipe.spiceLevel == SpiceLevel.hot ||
+                  recipe.spiceLevel == SpiceLevel.extraHot
               ? Colors.red.withValues(alpha: 0.7)
               : colorScheme.outline,
         ),
@@ -340,7 +347,8 @@ class RecipeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPriceAndAction(BuildContext context, ThemeData theme, ColorScheme colorScheme) {
+  Widget _buildPriceAndAction(
+      BuildContext context, ThemeData theme, ColorScheme colorScheme) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -351,7 +359,7 @@ class RecipeCard extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  '${recipe.price.toStringAsFixed(0)}',
+                  recipe.price.toStringAsFixed(0),
                   style: theme.textTheme.titleLarge?.copyWith(
                     color: colorScheme.primary,
                     fontWeight: FontWeight.bold,
@@ -374,7 +382,7 @@ class RecipeCard extends StatelessWidget {
             ),
           ],
         ),
-        
+
         // Add to Cart Button
         if (showAddToCart)
           Consumer<CartProvider>(
@@ -386,13 +394,15 @@ class RecipeCard extends StatelessWidget {
                 return Container(
                   decoration: BoxDecoration(
                     color: colorScheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.defaultBorderRadius),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        onPressed: () => cartProvider.updateQuantity(recipe.id, quantity - 1),
+                        onPressed: () => cartProvider.updateQuantity(
+                            recipe.id, quantity - 1),
                         icon: Icon(
                           Icons.remove,
                           color: colorScheme.primary,
@@ -434,7 +444,8 @@ class RecipeCard extends StatelessWidget {
                   foregroundColor: colorScheme.onPrimary,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.defaultBorderRadius),
                   ),
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppConstants.defaultSpacing,

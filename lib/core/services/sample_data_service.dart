@@ -1,7 +1,8 @@
 import 'package:baty_bites/models/recipe.dart';
-import 'package:baty_bites/models/user.dart';
+import 'package:baty_bites/models/user.dart' as user_model;
 import 'package:baty_bites/models/address.dart';
 import 'package:baty_bites/models/order.dart';
+import 'package:baty_bites/models/auth.dart';
 import 'package:baty_bites/core/constants/app_constants.dart';
 
 class SampleDataService {
@@ -13,7 +14,8 @@ class SampleDataService {
         chefName: 'فاطمة أحمد',
         chefImage: AppConstants.sampleChefImages[0],
         title: 'كشري بيتي',
-        description: 'كشري مصري أصيل بالطريقة التقليدية مع الأرز والعدس والمكرونة والصلصة الحارة',
+        description:
+            'كشري مصري أصيل بالطريقة التقليدية مع الأرز والعدس والمكرونة والصلصة الحارة',
         ingredients: [
           const Ingredient(name: 'أرز أبيض', quantity: '2', unit: 'كوب'),
           const Ingredient(name: 'عدس أسود', quantity: '1', unit: 'كوب'),
@@ -24,11 +26,26 @@ class SampleDataService {
           const Ingredient(name: 'حمص', quantity: '1', unit: 'كوب'),
         ],
         instructions: [
-          const CookingStep(stepNumber: 1, instruction: 'اسلقي الأرز والعدس والحمص كل منهما على حدة', timeMinutes: 30),
-          const CookingStep(stepNumber: 2, instruction: 'اسلقي المكرونة حتى تنضج', timeMinutes: 15),
-          const CookingStep(stepNumber: 3, instruction: 'قطعي البصل شرائح واقليه حتى يذبل ويصبح ذهبي اللون', timeMinutes: 10),
-          const CookingStep(stepNumber: 4, instruction: 'حضري الصلصة بخلط الطماطم والثوم والتوابل', timeMinutes: 20),
-          const CookingStep(stepNumber: 5, instruction: 'اخلطي جميع المكونات واتركيها تنضج معاً', timeMinutes: 10),
+          const CookingStep(
+              stepNumber: 1,
+              instruction: 'اسلقي الأرز والعدس والحمص كل منهما على حدة',
+              timeMinutes: 30),
+          const CookingStep(
+              stepNumber: 2,
+              instruction: 'اسلقي المكرونة حتى تنضج',
+              timeMinutes: 15),
+          const CookingStep(
+              stepNumber: 3,
+              instruction: 'قطعي البصل شرائح واقليه حتى يذبل ويصبح ذهبي اللون',
+              timeMinutes: 10),
+          const CookingStep(
+              stepNumber: 4,
+              instruction: 'حضري الصلصة بخلط الطماطم والثوم والتوابل',
+              timeMinutes: 20),
+          const CookingStep(
+              stepNumber: 5,
+              instruction: 'اخلطي جميع المكونات واتركيها تنضج معاً',
+              timeMinutes: 10),
         ],
         price: 35.0,
         images: [AppConstants.sampleRecipeImages[0]],
@@ -62,13 +79,26 @@ class SampleDataService {
           const Ingredient(name: 'أرز أبيض', quantity: '2', unit: 'كوب'),
           const Ingredient(name: 'شوربة فراخ', quantity: '4', unit: 'أكواب'),
           const Ingredient(name: 'ثوم', quantity: '6', unit: 'فصوص'),
-          const Ingredient(name: 'كزبرة ناشفة', quantity: '2', unit: 'ملعقة صغيرة'),
+          const Ingredient(
+              name: 'كزبرة ناشفة', quantity: '2', unit: 'ملعقة صغيرة'),
         ],
         instructions: [
-          const CookingStep(stepNumber: 1, instruction: 'اسلقي الفراخ مع البصل والتوابل', timeMinutes: 45),
-          const CookingStep(stepNumber: 2, instruction: 'قطعي الملوخية ناعم جداً', timeMinutes: 15),
-          const CookingStep(stepNumber: 3, instruction: 'حمري الثوم في الزيت مع الكزبرة', timeMinutes: 5),
-          const CookingStep(stepNumber: 4, instruction: 'أضيفي الملوخية للشوربة واتركيها تنضج', timeMinutes: 20),
+          const CookingStep(
+              stepNumber: 1,
+              instruction: 'اسلقي الفراخ مع البصل والتوابل',
+              timeMinutes: 45),
+          const CookingStep(
+              stepNumber: 2,
+              instruction: 'قطعي الملوخية ناعم جداً',
+              timeMinutes: 15),
+          const CookingStep(
+              stepNumber: 3,
+              instruction: 'حمري الثوم في الزيت مع الكزبرة',
+              timeMinutes: 5),
+          const CookingStep(
+              stepNumber: 4,
+              instruction: 'أضيفي الملوخية للشوربة واتركيها تنضج',
+              timeMinutes: 20),
         ],
         price: 65.0,
         images: [AppConstants.sampleRecipeImages[1]],
@@ -100,15 +130,31 @@ class SampleDataService {
           const Ingredient(name: 'قشطة طبيعية', quantity: '300', unit: 'جرام'),
           const Ingredient(name: 'سكر', quantity: '200', unit: 'جرام'),
           const Ingredient(name: 'ماء', quantity: '1', unit: 'كوب'),
-          const Ingredient(name: 'عسل أبيض', quantity: '3', unit: 'ملاعق كبيرة'),
+          const Ingredient(
+              name: 'عسل أبيض', quantity: '3', unit: 'ملاعق كبيرة'),
           const Ingredient(name: 'فستق مفروم', quantity: '50', unit: 'جرام'),
         ],
         instructions: [
-          const CookingStep(stepNumber: 1, instruction: 'حضري الشربات بغلي السكر والماء', timeMinutes: 10),
-          const CookingStep(stepNumber: 2, instruction: 'افردي نصف الكنافة في الصينية المدهونة', timeMinutes: 5),
-          const CookingStep(stepNumber: 3, instruction: 'ضعي القشطة فوق الكنافة وغطيها بالباقي', timeMinutes: 5),
-          const CookingStep(stepNumber: 4, instruction: 'اخبزي في الفرن حتى تصبح ذهبية', timeMinutes: 25),
-          const CookingStep(stepNumber: 5, instruction: 'اسكبي الشربات البارد فوق الكنافة الساخنة', timeMinutes: 2),
+          const CookingStep(
+              stepNumber: 1,
+              instruction: 'حضري الشربات بغلي السكر والماء',
+              timeMinutes: 10),
+          const CookingStep(
+              stepNumber: 2,
+              instruction: 'افردي نصف الكنافة في الصينية المدهونة',
+              timeMinutes: 5),
+          const CookingStep(
+              stepNumber: 3,
+              instruction: 'ضعي القشطة فوق الكنافة وغطيها بالباقي',
+              timeMinutes: 5),
+          const CookingStep(
+              stepNumber: 4,
+              instruction: 'اخبزي في الفرن حتى تصبح ذهبية',
+              timeMinutes: 25),
+          const CookingStep(
+              stepNumber: 5,
+              instruction: 'اسكبي الشربات البارد فوق الكنافة الساخنة',
+              timeMinutes: 2),
         ],
         price: 45.0,
         images: [AppConstants.sampleRecipeImages[2]],
@@ -143,10 +189,22 @@ class SampleDataService {
           const Ingredient(name: 'بصل مفروم', quantity: '1', unit: 'حبة'),
         ],
         instructions: [
-          const CookingStep(stepNumber: 1, instruction: 'انقعي ورق العنب في الماء المالح', timeMinutes: 30),
-          const CookingStep(stepNumber: 2, instruction: 'حضري الحشو بخلط اللحمة والأرز والتوابل', timeMinutes: 15),
-          const CookingStep(stepNumber: 3, instruction: 'احشي أوراق العنب ولفيها بإحكام', timeMinutes: 45),
-          const CookingStep(stepNumber: 4, instruction: 'رصيها في الحلة واتركيها تنضج', timeMinutes: 60),
+          const CookingStep(
+              stepNumber: 1,
+              instruction: 'انقعي ورق العنب في الماء المالح',
+              timeMinutes: 30),
+          const CookingStep(
+              stepNumber: 2,
+              instruction: 'حضري الحشو بخلط اللحمة والأرز والتوابل',
+              timeMinutes: 15),
+          const CookingStep(
+              stepNumber: 3,
+              instruction: 'احشي أوراق العنب ولفيها بإحكام',
+              timeMinutes: 45),
+          const CookingStep(
+              stepNumber: 4,
+              instruction: 'رصيها في الحلة واتركيها تنضج',
+              timeMinutes: 60),
         ],
         price: 55.0,
         images: [AppConstants.sampleRecipeImages[3]],
@@ -171,7 +229,8 @@ class SampleDataService {
         chefId: 'chef1',
         chefName: 'فاطمة أحمد',
         title: 'فتة الدجاج',
-        description: 'فتة لذيذة بالدجاج المسلوق والأرز الأبيض وصلصة الطحينة والثوم',
+        description:
+            'فتة لذيذة بالدجاج المسلوق والأرز الأبيض وصلصة الطحينة والثوم',
         ingredients: [
           const Ingredient(name: 'دجاج مسلوق', quantity: '500', unit: 'جرام'),
           const Ingredient(name: 'أرز أبيض', quantity: '2', unit: 'كوب'),
@@ -181,11 +240,26 @@ class SampleDataService {
           const Ingredient(name: 'ثوم مفروم', quantity: '4', unit: 'فصوص'),
         ],
         instructions: [
-          const CookingStep(stepNumber: 1, instruction: 'اسلقي الدجاج مع التوابل واحتفظي بالشوربة', timeMinutes: 45),
-          const CookingStep(stepNumber: 2, instruction: 'اطبخي الأرز في شوربة الفراخ', timeMinutes: 20),
-          const CookingStep(stepNumber: 3, instruction: 'حضري صلصة الطحينة بخلطها مع اللبن والثوم', timeMinutes: 10),
-          const CookingStep(stepNumber: 4, instruction: 'رصي الخبز المحمص والأرز والدجاج', timeMinutes: 10),
-          const CookingStep(stepNumber: 5, instruction: 'اسكبي الصلصة وقدميها ساخنة', timeMinutes: 5),
+          const CookingStep(
+              stepNumber: 1,
+              instruction: 'اسلقي الدجاج مع التوابل واحتفظي بالشوربة',
+              timeMinutes: 45),
+          const CookingStep(
+              stepNumber: 2,
+              instruction: 'اطبخي الأرز في شوربة الفراخ',
+              timeMinutes: 20),
+          const CookingStep(
+              stepNumber: 3,
+              instruction: 'حضري صلصة الطحينة بخلطها مع اللبن والثوم',
+              timeMinutes: 10),
+          const CookingStep(
+              stepNumber: 4,
+              instruction: 'رصي الخبز المحمص والأرز والدجاج',
+              timeMinutes: 10),
+          const CookingStep(
+              stepNumber: 5,
+              instruction: 'اسكبي الصلصة وقدميها ساخنة',
+              timeMinutes: 5),
         ],
         price: 48.0,
         images: [AppConstants.sampleRecipeImages[4]],
@@ -217,13 +291,26 @@ class SampleDataService {
           const Ingredient(name: 'قشطة طبيعية', quantity: '200', unit: 'جرام'),
           const Ingredient(name: 'لبن', quantity: '1', unit: 'كوب'),
           const Ingredient(name: 'سكر', quantity: '1', unit: 'كوب'),
-          const Ingredient(name: 'بيكينج بودر', quantity: '2', unit: 'ملعقة صغيرة'),
+          const Ingredient(
+              name: 'بيكينج بودر', quantity: '2', unit: 'ملعقة صغيرة'),
         ],
         instructions: [
-          const CookingStep(stepNumber: 1, instruction: 'اخلطي السميد وجوز الهند والبيكينج بودر', timeMinutes: 5),
-          const CookingStep(stepNumber: 2, instruction: 'أضيفي اللبن والقشطة واخلطي جيداً', timeMinutes: 10),
-          const CookingStep(stepNumber: 3, instruction: 'اتركي الخليط ينتفش لمدة 30 دقيقة', timeMinutes: 30),
-          const CookingStep(stepNumber: 4, instruction: 'اسكبي في الصينية المدهونة واخبزي', timeMinutes: 35),
+          const CookingStep(
+              stepNumber: 1,
+              instruction: 'اخلطي السميد وجوز الهند والبيكينج بودر',
+              timeMinutes: 5),
+          const CookingStep(
+              stepNumber: 2,
+              instruction: 'أضيفي اللبن والقشطة واخلطي جيداً',
+              timeMinutes: 10),
+          const CookingStep(
+              stepNumber: 3,
+              instruction: 'اتركي الخليط ينتفش لمدة 30 دقيقة',
+              timeMinutes: 30),
+          const CookingStep(
+              stepNumber: 4,
+              instruction: 'اسكبي في الصينية المدهونة واخبزي',
+              timeMinutes: 35),
         ],
         price: 40.0,
         images: [AppConstants.sampleRecipeImages[5]],
@@ -246,15 +333,15 @@ class SampleDataService {
     ];
   }
 
-  static List<User> getSampleChefs() {
+  static List<user_model.User> getSampleChefs() {
     return [
-      User(
+      user_model.User(
         id: 'chef1',
         fullName: 'فاطمة أحمد',
         email: 'fatma@example.com',
         phone: '+201234567890',
         profileImage: AppConstants.sampleChefImages[0],
-        userType: UserType.chef,
+        userType: user_model.UserType.chef,
         createdAt: DateTime.now().subtract(const Duration(days: 180)),
         isVerified: true,
         rating: 4.8,
@@ -264,17 +351,18 @@ class SampleDataService {
           street: 'شارع النصر',
           area: 'الحي الخامس',
           city: 'القاهرة الجديدة',
+          state: 'القاهرة',
           latitude: 30.0444,
           longitude: 31.2357,
         ),
       ),
-      User(
+      user_model.User(
         id: 'chef2',
         fullName: 'أم محمد',
         email: 'ummohammad@example.com',
         phone: '+201987654321',
         profileImage: AppConstants.sampleChefImages[1],
-        userType: UserType.chef,
+        userType: user_model.UserType.chef,
         createdAt: DateTime.now().subtract(const Duration(days: 90)),
         isVerified: true,
         rating: 4.9,
@@ -284,6 +372,7 @@ class SampleDataService {
           street: 'شارع ٩٠',
           area: 'التجمع الخامس',
           city: 'القاهرة الجديدة',
+          state: 'القاهرة',
           latitude: 30.0626,
           longitude: 31.4285,
         ),
@@ -291,74 +380,100 @@ class SampleDataService {
     ];
   }
 
-  static List<Order> getSampleOrders({required String userId, required UserType userType}) {
+  static List<Order> getSampleOrders(
+      {required String userId, required UserType userType}) {
     final recipes = getSampleRecipes();
-    final chefs = getSampleChefs();
-    
+
     return [
       Order(
         id: 'order1',
         customerId: userType == UserType.customer ? userId : 'customer1',
-        customerName: userType == UserType.customer ? 'أحمد محمد' : 'أحمد محمد',
-        customerImage: '',
         chefId: userType == UserType.chef ? userId : recipes[0].chefId,
-        chefName: recipes[0].chefName,
-        chefImage: recipes[0].chefImage,
-        recipeId: recipes[0].id,
-        recipeTitle: recipes[0].title,
-        recipeImage: recipes[0].images.first,
-        quantity: 2,
-        unitPrice: recipes[0].price,
+        items: [
+          OrderItem(
+            id: 'item1',
+            orderId: 'order1',
+            recipeId: recipes[0].id,
+            recipeTitle: recipes[0].title,
+            recipeImage:
+                recipes[0].images.isNotEmpty ? recipes[0].images[0] : '',
+            quantity: 2,
+            unitPrice: recipes[0].price,
+            totalPrice: recipes[0].price * 2,
+            specialInstructions: 'بدون بصل',
+            createdAt: DateTime.now().subtract(const Duration(hours: 2)),
+          ),
+        ],
+        subtotal: recipes[0].price * 2,
         deliveryFee: 10.0,
-        totalPrice: (recipes[0].price * 2) + 10.0,
-        status: OrderStatus.preparing,
-        deliveryAddress: Address(
-          id: 'addr3',
-          street: 'شارع الجامعة',
-          area: 'مدينة نصر',
-          city: 'القاهرة',
-          building: '12',
-          floor: '3',
-          apartment: '5',
-          latitude: 30.0626,
-          longitude: 31.3219,
-        ),
+        serviceFee: (recipes[0].price * 2) * 0.1,
+        totalAmount:
+            (recipes[0].price * 2) + 10.0 + ((recipes[0].price * 2) * 0.1),
+        currency: 'EGP',
+        status: 'preparing',
+        paymentStatus: 'pending',
+        paymentMethod: 'cash',
+        deliveryAddress: 'شارع الجامعة، مدينة نصر، القاهرة',
         deliveryInstructions: 'الرجاء الاتصال عند الوصول',
-        paymentMethod: PaymentMethod.cash,
-        paymentStatus: PaymentStatus.pending,
         estimatedDeliveryTime: DateTime.now().add(const Duration(minutes: 45)),
+        commission: (recipes[0].price * 2) * 0.05,
         createdAt: DateTime.now().subtract(const Duration(hours: 2)),
-        updatedAt: DateTime.now().subtract(const Duration(minutes: 30)),
+        updatedAt: DateTime.now().subtract(const Duration(hours: 2)),
+        customer: User(
+          id: 'customer1',
+          fullName: 'أحمد محمد',
+          phone: '+201234567890',
+          email: 'ahmed@example.com',
+        ),
+        chef: User(
+          id: recipes[0].chefId,
+          fullName: recipes[0].chefName,
+          phone: '+201987654321',
+        ),
       ),
       Order(
         id: 'order2',
         customerId: userType == UserType.customer ? userId : 'customer2',
-        customerName: userType == UserType.customer ? 'سارة علي' : 'سارة علي',
-        customerImage: '',
         chefId: userType == UserType.chef ? userId : recipes[1].chefId,
-        chefName: recipes[1].chefName,
-        chefImage: recipes[1].chefImage,
-        recipeId: recipes[1].id,
-        recipeTitle: recipes[1].title,
-        recipeImage: recipes[1].images.first,
-        quantity: 1,
-        unitPrice: recipes[1].price,
-        deliveryFee: 0.0, // Free delivery
-        totalPrice: recipes[1].price,
-        status: OrderStatus.delivered,
-        deliveryAddress: Address(
-          id: 'addr4',
-          street: 'شارع التسعين',
-          area: 'التجمع الخامس',
-          city: 'القاهرة الجديدة',
-          latitude: 30.0626,
-          longitude: 31.4285,
+        items: [
+          OrderItem(
+            id: 'item2',
+            orderId: 'order2',
+            recipeId: recipes[1].id,
+            recipeTitle: recipes[1].title,
+            recipeImage:
+                recipes[1].images.isNotEmpty ? recipes[1].images[0] : '',
+            quantity: 1,
+            unitPrice: recipes[1].price,
+            totalPrice: recipes[1].price,
+            createdAt: DateTime.now().subtract(const Duration(days: 1)),
+          ),
+        ],
+        subtotal: recipes[1].price,
+        deliveryFee: 10.0,
+        serviceFee: recipes[1].price * 0.1,
+        totalAmount: recipes[1].price + 10.0 + (recipes[1].price * 0.1),
+        currency: 'EGP',
+        status: 'completed',
+        paymentStatus: 'paid',
+        commission: recipes[1].price * 0.05,
+        createdAt: DateTime.now().subtract(const Duration(days: 1)),
+        updatedAt: DateTime.now().subtract(const Duration(hours: 12)),
+        customer: User(
+          id: 'customer2',
+          fullName: 'سارة أحمد',
+          phone: '+201234567891',
+          email: 'sara@example.com',
         ),
-        paymentMethod: PaymentMethod.cash,
-        paymentStatus: PaymentStatus.paid,
-        actualDeliveryTime: DateTime.now().subtract(const Duration(days: 2, hours: 3)),
-        createdAt: DateTime.now().subtract(const Duration(days: 3)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 2, hours: 3)),
+        chef: User(
+          id: recipes[1].chefId,
+          fullName: recipes[1].chefName,
+          phone: '+201987654322',
+        ),
+        deliveryAddress: 'شارع التسعين، التجمع الخامس، القاهرة الجديدة',
+        actualDeliveryTime:
+            DateTime.now().subtract(const Duration(days: 2, hours: 3)),
+        paymentMethod: 'cash',
       ),
     ];
   }

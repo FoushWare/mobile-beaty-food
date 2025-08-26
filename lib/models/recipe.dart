@@ -67,11 +67,15 @@ class Recipe {
   });
 
   factory Recipe.fromJson(Map<String, dynamic> json) {
+    // Handle nested chef object from backend
+    final chefData = json['chef'] as Map<String, dynamic>? ?? {};
+    final imagesData = json['images'] as List<dynamic>? ?? [];
+    
     return Recipe(
       id: json['id'] ?? '',
       chefId: json['chefId'] ?? '',
-      chefName: json['chefName'] ?? '',
-      chefImage: json['chefImage'] ?? '',
+      chefName: chefData['fullName'] ?? '',
+      chefImage: chefData['profileImage'] ?? '',
       title: json['title'] ?? '',
       description: json['description'] ?? '',
       ingredients: (json['ingredients'] as List<dynamic>? ?? [])
@@ -82,7 +86,7 @@ class Recipe {
           .toList(),
       price: (json['price'] ?? 0).toDouble(),
       currency: json['currency'] ?? 'EGP',
-      images: List<String>.from(json['images'] ?? []),
+      images: imagesData.map((img) => img['url'] as String).toList(),
       cuisineType: json['cuisineType'] ?? '',
       category: json['category'] ?? '',
       preparationTime: json['preparationTime'] ?? 0,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:baty_bites/models/user.dart';
-import 'package:baty_bites/core/services/storage_service.dart';
+import 'package:baty_bites/models/auth.dart';
 import 'package:baty_bites/screens/onboarding/splash_screen.dart';
 import 'package:baty_bites/screens/onboarding/welcome_screen.dart';
 import 'package:baty_bites/screens/auth/user_type_selection_screen.dart';
@@ -14,8 +13,18 @@ import 'package:baty_bites/screens/customer/checkout_screen.dart';
 import 'package:baty_bites/screens/customer/order_tracking_screen.dart';
 import 'package:baty_bites/screens/chef/chef_dashboard_screen.dart';
 import 'package:baty_bites/screens/chef/recipe_management_screen.dart';
-import 'package:baty_bites/screens/chef/order_queue_screen.dart';
+import 'package:baty_bites/screens/chef/chef_order_queue_screen.dart';
+import 'package:baty_bites/screens/chef/earnings_screen.dart';
+import 'package:baty_bites/screens/chef/analytics_screen.dart';
+import 'package:baty_bites/screens/chef/customer_feedback_screen.dart';
+import 'package:baty_bites/screens/chef/availability_screen.dart';
+import 'package:baty_bites/screens/chef/recipe_form_screen.dart';
+import 'package:baty_bites/screens/chef/recipe_analytics_screen.dart';
+import 'package:baty_bites/models/recipe.dart';
 import 'package:baty_bites/screens/shared/profile_screen.dart';
+import 'package:baty_bites/screens/notifications_screen.dart';
+import 'package:baty_bites/screens/customer/favorites_screen.dart';
+import 'package:baty_bites/screens/customer/search_screen.dart';
 
 class AppRouter {
   static const String splash = '/';
@@ -96,6 +105,18 @@ class AppRouter {
               path: 'profile',
               builder: (context, state) => const ProfileScreen(),
             ),
+            GoRoute(
+              path: 'notifications',
+              builder: (context, state) => const NotificationsScreen(),
+            ),
+            GoRoute(
+              path: 'favorites',
+              builder: (context, state) => const FavoritesScreen(),
+            ),
+            GoRoute(
+              path: 'search',
+              builder: (context, state) => const SearchScreen(),
+            ),
           ],
         ),
         GoRoute(
@@ -107,8 +128,38 @@ class AppRouter {
               builder: (context, state) => const RecipeManagementScreen(),
             ),
             GoRoute(
+              path: 'recipe-form',
+              builder: (context, state) {
+                final recipe = state.extra as Recipe?;
+                return RecipeFormScreen(recipe: recipe);
+              },
+            ),
+            GoRoute(
+              path: 'recipe-analytics',
+              builder: (context, state) {
+                final recipe = state.extra as Recipe;
+                return RecipeAnalyticsScreen(recipe: recipe);
+              },
+            ),
+            GoRoute(
               path: 'order-queue',
-              builder: (context, state) => const OrderQueueScreen(),
+              builder: (context, state) => const ChefOrderQueueScreen(),
+            ),
+            GoRoute(
+              path: 'earnings',
+              builder: (context, state) => const EarningsScreen(),
+            ),
+            GoRoute(
+              path: 'analytics',
+              builder: (context, state) => const AnalyticsScreen(),
+            ),
+            GoRoute(
+              path: 'feedback',
+              builder: (context, state) => const CustomerFeedbackScreen(),
+            ),
+            GoRoute(
+              path: 'availability',
+              builder: (context, state) => const AvailabilityScreen(),
             ),
             GoRoute(
               path: 'profile',

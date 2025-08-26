@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/auth.dart';
@@ -6,9 +5,9 @@ import '../../models/auth.dart';
 class AuthService {
   static const String _baseUrl = 'http://localhost:3000/api';
   static const String _authBaseUrl = '$_baseUrl/auth';
-  
+
   late final Dio _dio;
-  
+
   // Storage keys
   static const String _accessTokenKey = 'access_token';
   static const String _refreshTokenKey = 'refresh_token';
@@ -146,7 +145,8 @@ class AuthService {
         if (city != null) 'city': city,
         if (state != null) 'state': state,
         if (zipCode != null) 'zipCode': zipCode,
-        if (dietaryRestrictions != null) 'dietaryRestrictions': dietaryRestrictions,
+        if (dietaryRestrictions != null)
+          'dietaryRestrictions': dietaryRestrictions,
         if (favoriteCuisines != null) 'favoriteCuisines': favoriteCuisines,
         if (spicePreference != null) 'spicePreference': spicePreference,
       });
@@ -238,10 +238,10 @@ class AuthService {
   Future<bool> logout() async {
     try {
       final response = await _dio.post('/logout');
-      
+
       // Clear stored data regardless of response
       await _clearAuthData();
-      
+
       return response.data['success'] == true;
     } catch (e) {
       // Clear stored data even if API call fails
@@ -300,7 +300,7 @@ class AuthService {
   Future<ProfileCompletionLevel?> getCurrentProfileLevel() async {
     final level = await _getProfileLevel();
     if (level == null) return null;
-    
+
     return ProfileCompletionLevel.values.firstWhere(
       (l) => l.name == level,
       orElse: () => ProfileCompletionLevel.mobileVerified,
@@ -311,7 +311,7 @@ class AuthService {
 
   Future<void> _storeAuthData(Map<String, dynamic> data) async {
     final prefs = await SharedPreferences.getInstance();
-    
+
     if (data['accessToken'] != null) {
       await prefs.setString(_accessTokenKey, data['accessToken']);
     }
@@ -345,6 +345,10 @@ class AuthService {
   Future<String?> _getAccessToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_accessTokenKey);
+  }
+
+  Future<String?> getToken() async {
+    return _getAccessToken();
   }
 
   Future<String?> _getRefreshToken() async {
@@ -422,5 +426,3 @@ class AuthService {
   /// Get fixed OTP for development
   String getFixedOtp() => _fixedOtp;
 }
-
-

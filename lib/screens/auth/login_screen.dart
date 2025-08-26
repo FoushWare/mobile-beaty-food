@@ -1,13 +1,14 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:baty_bites/core/router/app_router.dart';
-import 'package:baty_bites/core/services/storage_service.dart';
-import 'package:baty_bites/core/services/sample_data_service.dart';
 import 'package:baty_bites/core/constants/app_constants.dart';
-import 'package:baty_bites/models/user.dart';
+import 'package:baty_bites/models/auth.dart';
 import 'package:baty_bites/widgets/common/app_button.dart';
 import 'package:baty_bites/widgets/common/app_text_field.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   final UserType? userType;
 
   const LoginScreen({
@@ -16,27 +17,30 @@ class LoginScreen extends StatefulWidget {
   });
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
+class _LoginScreenState extends ConsumerState<LoginScreen>
     with TickerProviderStateMixin {
-  late TextEditingController _emailController;
-  late TextEditingController _passwordController;
+  late TextEditingController _phoneController;
+  late TextEditingController _otpController;
   late AnimationController _animationController;
   late List<Animation<double>> _fadeAnimations;
   late List<Animation<Offset>> _slideAnimations;
-  
+
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  bool _otpSent = false;
+  bool _isResendingOtp = false;
+  int _resendCountdown = 0;
   UserType _userType = UserType.customer;
 
   @override
   void initState() {
     super.initState();
     _userType = widget.userType ?? UserType.customer;
-    _emailController = TextEditingController();
-    _passwordController = TextEditingController();
+    _phoneController = TextEditingController();
+    _otpController = TextEditingController();
     _setupAnimations();
   }
 
@@ -81,13 +85,13 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
+    _phoneController.dispose();
+    _otpController.dispose();
     _animationController.dispose();
     super.dispose();
   }
 
-  Future<void> _login() async {
+  Future<void> _sendOtp() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
@@ -95,44 +99,45 @@ class _LoginScreenState extends State<LoginScreen>
     });
 
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
+      final success =
+          await ref.read(authProvider.notifier).sendOtp(_phoneController.text);
 
-      // For demo purposes, create a sample user
-      final sampleUsers = SampleDataService.getSampleChefs();
-      final user = _userType == UserType.customer 
-          ? User(
-              id: 'customer1',
-              fullName: 'أحمد محمد',
-              email: _emailController.text,
-              phone: '+201234567890',
-              profileImage: '',
-              userType: UserType.customer,
-              createdAt: DateTime.now(),
-              isVerified: true,
-            )
-          : sampleUsers.first.copyWith(
-              email: _emailController.text,
-            );
+      if (success) {
+        setState(() {
+          _otpSent = true;
+          _isLoading = false;
+        });
 
-      // Save user data
-      final storageService = await StorageService.getInstance();
-      await storageService.saveToken('sample_token_${DateTime.now().millisecondsSinceEpoch}');
-      await storageService.saveUser(user);
+        // Start resend countdown
+        _startResendCountdown();
 
-      if (mounted) {
-        // Navigate to appropriate home screen
-        if (_userType == UserType.chef) {
-          AppRouter.go(AppRouter.chefDashboard);
-        } else {
-          AppRouter.go(AppRouter.customerHome);
+        // Show success message with OTP for development
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'تم إرسال رمز التحقق إلى ${_phoneController.text}\nرمز التحقق: 1234'),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              duration: const Duration(seconds: 5),
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          final errorMessage = ref.read(authProvider).errorMessage;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMessage ?? 'حدث خطأ أثناء إرسال رمز التحقق'),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
         }
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('حدث خطأ أثناء تسجيل الدخول: ${e.toString()}'),
+            content: Text('حدث خطأ أثناء إرسال رمز التحقق: ${e.toString()}'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -146,26 +151,158 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
+  Future<void> _verifyOtp() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final success = await authProvider.verifyOtp(
+          _phoneController.text, _otpController.text);
+
+      if (success) {
+        // Navigate to user type selection or home based on user data
+        if (mounted) {
+          final currentUser = authProvider.currentUser;
+          if (currentUser != null && currentUser['userType'] != null) {
+            // User already has a type, go to appropriate home
+            final userType = currentUser['userType'] as UserType;
+
+            if (userType == UserType.chef) {
+              AppRouter.go(AppRouter.chefDashboard);
+            } else {
+              AppRouter.go(AppRouter.customerHome);
+            }
+          } else {
+            // New user, go to user type selection
+            AppRouter.push(AppRouter.userTypeSelection);
+          }
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(authProvider.errorMessage ?? 'رمز التحقق غير صحيح'),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('حدث خطأ أثناء التحقق من الرمز: ${e.toString()}'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _startResendCountdown() {
+    setState(() {
+      _resendCountdown = 60;
+    });
+
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          _resendCountdown--;
+        });
+
+        if (_resendCountdown <= 0) {
+          timer.cancel();
+        }
+      } else {
+        timer.cancel();
+      }
+    });
+  }
+
+  Future<void> _resendOtp() async {
+    if (_resendCountdown > 0) return;
+
+    setState(() {
+      _isResendingOtp = true;
+    });
+
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final success = await authProvider.sendOtp(_phoneController.text);
+
+      if (success) {
+        _startResendCountdown();
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content:
+                  const Text('تم إعادة إرسال رمز التحقق\nرمز التحقق: 1234'),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(authProvider.errorMessage ??
+                  'حدث خطأ أثناء إعادة إرسال الرمز'),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('حدث خطأ أثناء إعادة إرسال الرمز: ${e.toString()}'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isResendingOtp = false;
+        });
+      }
+    }
+  }
+
   void _goToRegister() {
     AppRouter.push(AppRouter.register, extra: _userType);
   }
 
-  String? _validateEmail(String? value) {
+  String? _validatePhone(String? value) {
     if (value == null || value.isEmpty) {
-      return 'الرجاء إدخال البريد الإلكتروني';
+      return 'الرجاء إدخال رقم الهاتف';
     }
-    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-      return 'الرجاء إدخال بريد إلكتروني صحيح';
+    // Basic phone validation for Egyptian numbers
+    if (!RegExp(r'^\+20[0-9]{10}$').hasMatch(value)) {
+      return 'الرجاء إدخال رقم هاتف مصري صحيح (+20xxxxxxxxxx)';
     }
     return null;
   }
 
-  String? _validatePassword(String? value) {
+  String? _validateOtp(String? value) {
     if (value == null || value.isEmpty) {
-      return 'الرجاء إدخال كلمة المرور';
+      return 'الرجاء إدخال رمز التحقق';
     }
-    if (value.length < 6) {
-      return 'كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل';
+    if (value.length != 4) {
+      return 'رمز التحقق يجب أن يكون 4 أرقام';
     }
     return null;
   }
@@ -214,7 +351,7 @@ class _LoginScreenState extends State<LoginScreen>
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
-                                _userType == UserType.customer 
+                                _userType == UserType.customer
                                     ? Icons.person
                                     : Icons.restaurant,
                                 size: 40,
@@ -222,9 +359,8 @@ class _LoginScreenState extends State<LoginScreen>
                               ),
                             ),
                             const SizedBox(height: AppConstants.largeSpacing),
-                            
                             Text(
-                              _userType == UserType.customer 
+                              _userType == UserType.customer
                                   ? 'تسجيل دخول العميل'
                                   : 'تسجيل دخول الطاهي',
                               style: theme.textTheme.headlineSmall?.copyWith(
@@ -235,13 +371,13 @@ class _LoginScreenState extends State<LoginScreen>
                               textDirection: TextDirection.rtl,
                             ),
                             const SizedBox(height: AppConstants.smallSpacing),
-                            
                             Text(
                               _userType == UserType.customer
                                   ? 'اكتشف أشهى الأطباق البيتية'
                                   : 'شارك وصفاتك المميزة مع العالم',
                               style: theme.textTheme.bodyLarge?.copyWith(
-                                color: colorScheme.onSurface.withValues(alpha: 0.7),
+                                color: colorScheme.onSurface
+                                    .withValues(alpha: 0.7),
                               ),
                               textAlign: TextAlign.center,
                               textDirection: TextDirection.rtl,
@@ -250,88 +386,107 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: AppConstants.extraLargeSpacing),
-                    
-                    // Email Field
+
+                    // Phone Field
                     FadeTransition(
                       opacity: _fadeAnimations[1],
                       child: SlideTransition(
                         position: _slideAnimations[1],
-                        child: AppTextField.email(
-                          labelText: 'البريد الإلكتروني',
-                          hintText: 'example@email.com',
-                          controller: _emailController,
-                          prefixIcon: const Icon(Icons.email_outlined),
-                          validator: _validateEmail,
-                          textInputAction: TextInputAction.next,
-                        ),
-                      ),
-                    ),
-                    
-                    const SizedBox(height: AppConstants.defaultSpacing),
-                    
-                    // Password Field
-                    FadeTransition(
-                      opacity: _fadeAnimations[2],
-                      child: SlideTransition(
-                        position: _slideAnimations[2],
-                        child: AppTextField.password(
-                          labelText: 'كلمة المرور',
-                          hintText: '••••••••',
-                          controller: _passwordController,
-                          prefixIcon: const Icon(Icons.lock_outlined),
-                          validator: _validatePassword,
+                        child: AppTextField(
+                          labelText: 'رقم الهاتف',
+                          hintText: '+201234567890',
+                          controller: _phoneController,
+                          prefixIcon: const Icon(Icons.phone_outlined),
+                          validator: _validatePhone,
                           textInputAction: TextInputAction.done,
+                          type: AppTextFieldType.phone,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          onChanged: (value) {
+                            if (value.isNotEmpty && !value.startsWith('+20')) {
+                              _phoneController.text = '+20$value';
+                              _phoneController.selection =
+                                  TextSelection.fromPosition(
+                                TextPosition(
+                                    offset: _phoneController.text.length),
+                              );
+                            }
+                          },
                         ),
                       ),
                     ),
-                    
-                    const SizedBox(height: AppConstants.smallSpacing),
-                    
-                    // Forgot Password
-                    FadeTransition(
-                      opacity: _fadeAnimations[2],
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {
-                            // TODO: Implement forgot password
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('سيتم إضافة هذه الميزة قريباً'),
+
+                    const SizedBox(height: AppConstants.defaultSpacing),
+
+                    // OTP Field (only show after OTP is sent)
+                    if (_otpSent) ...[
+                      FadeTransition(
+                        opacity: _fadeAnimations[2],
+                        child: SlideTransition(
+                          position: _slideAnimations[2],
+                          child: AppTextField(
+                            labelText: 'رمز التحقق',
+                            hintText: '1234',
+                            controller: _otpController,
+                            prefixIcon: const Icon(Icons.security_outlined),
+                            validator: _validateOtp,
+                            textInputAction: TextInputAction.done,
+                            type: AppTextFieldType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(4),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: AppConstants.smallSpacing),
+
+                      // Resend OTP
+                      FadeTransition(
+                        opacity: _fadeAnimations[2],
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: _resendCountdown > 0 ? null : _resendOtp,
+                            child: Text(
+                              _resendCountdown > 0
+                                  ? 'إعادة الإرسال خلال $_resendCountdown ثانية'
+                                  : 'إعادة إرسال الرمز',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: _resendCountdown > 0
+                                    ? colorScheme.onSurface
+                                        .withValues(alpha: 0.5)
+                                    : colorScheme.primary,
                               ),
-                            );
-                          },
-                          child: Text(
-                            'نسيت كلمة المرور؟',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.primary,
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    
+                    ],
+
                     const SizedBox(height: AppConstants.largeSpacing),
-                    
-                    // Login Button
+
+                    // Action Button
                     FadeTransition(
                       opacity: _fadeAnimations[3],
                       child: SlideTransition(
                         position: _slideAnimations[3],
                         child: AppButton.primary(
-                          text: 'تسجيل الدخول',
-                          onPressed: _login,
-                          isLoading: _isLoading,
+                          text: _otpSent ? 'تأكيد الرمز' : 'إرسال رمز التحقق',
+                          onPressed: _otpSent ? _verifyOtp : _sendOtp,
+                          isLoading: _isLoading || _isResendingOtp,
                           isExpanded: true,
-                          icon: const Icon(Icons.login),
+                          icon: Icon(_otpSent ? Icons.verified : Icons.send),
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: AppConstants.largeSpacing),
-                    
+
                     // Register Link
                     FadeTransition(
                       opacity: _fadeAnimations[3],
@@ -341,7 +496,8 @@ class _LoginScreenState extends State<LoginScreen>
                           Text(
                             'ليس لديك حساب؟ ',
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onSurface.withValues(alpha: 0.7),
+                              color:
+                                  colorScheme.onSurface.withValues(alpha: 0.7),
                             ),
                           ),
                           TextButton(
@@ -357,17 +513,20 @@ class _LoginScreenState extends State<LoginScreen>
                         ],
                       ),
                     ),
-                    
+
                     const SizedBox(height: AppConstants.largeSpacing),
-                    
+
                     // Demo Info Card
                     FadeTransition(
                       opacity: _fadeAnimations[3],
                       child: Container(
-                        padding: const EdgeInsets.all(AppConstants.defaultSpacing),
+                        padding:
+                            const EdgeInsets.all(AppConstants.defaultSpacing),
                         decoration: BoxDecoration(
-                          color: colorScheme.primaryContainer.withValues(alpha: 0.3),
-                          borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
+                          color: colorScheme.primaryContainer
+                              .withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(
+                              AppConstants.defaultBorderRadius),
                           border: Border.all(
                             color: colorScheme.primary.withValues(alpha: 0.3),
                           ),
@@ -395,9 +554,10 @@ class _LoginScreenState extends State<LoginScreen>
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'يمكنك استخدام أي بريد إلكتروني وكلمة مرور للتجربة.\nسيتم إنشاء حساب تجريبي تلقائياً.',
+                              'استخدم رقم الهاتف: +201111111111\nرمز التحقق: 1234\nأو أي رقم هاتف مصري صحيح.',
                               style: theme.textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurface.withValues(alpha: 0.8),
+                                color: colorScheme.onSurface
+                                    .withValues(alpha: 0.8),
                               ),
                               textDirection: TextDirection.rtl,
                             ),
